@@ -1,3 +1,7 @@
+// -----------------------------
+// -----  Policy Iteration -----
+// -----------------------------
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +17,9 @@ public class Normal {
     // ロケーションAに置かれる車の最大数と，ろけーしょんBにおけるそれ．
     int maxNumOfCarsInFirstPlace = 10;
     int maxNumOfCarsInSecondPlace = 10;
+
+    // 報酬空間
+    int[] rewardSpace = {0,1};
 
     // v(s) ある状態sにおける価値
     int[][] valueFunc = new int[maxNumOfCarsInFirstPlace][maxNumOfCarsInSecondPlace];
@@ -43,7 +50,7 @@ public class Normal {
         }
     }
 
-    // Policy Evaluation
+    // 2.Policy Evaluation
     private void evalPolicy() {
         // 直前の価値関数一時退避先
         double v;
@@ -58,20 +65,36 @@ public class Normal {
         } while (!(delta < theta));
     }
 
+    // 指定された状態sにおける価値を計算する．
     private double calcValue(int numOfCarsInFirst, int numOfCarsInSecond) {
         double value = 0.;
+        // 状態空間をスイープする
         for (int i = 0; i < maxNumOfCarsInFirstPlace; i++) {
             for (int j = 0; j < maxNumOfCarsInSecondPlace; j++) {
-                
+                // 状態空間もスイープする
+                for (int k = 0; k < rewardSpace.length; k++) {
+
+                }
             }
         }
         return value;
     }
 
+    // 報酬関数
+    // ある状態sにおいてある行動aを取った際に報酬rが得られる確率
+    private double getRewardProb(int prevNumOfCarsInFirst, int prevNumOfCarsInSecond, int action, int reward) {
+        double probability = 0.;
+        return probability;
+    }
+
     // 毎回計算しているね
+    // 遷移関数
+    // 遷移関数を表す関数．ある状態sにおいて行動aを取った際にある状態s'に移る確率を返す．
     private double getTransitionProb(int prevNumOfCarsInFirst, int prevNumOfCarsInSecond, int nextNumOfCarsInFirst, int nextNumOfCarsInSecond, int action) {
         int expectedNumOfCarsInFirst = prevNumOfCarsInFirst;
         int expectedNumOfCarsInSecond = prevNumOfCarsInSecond;
+        // prevState（前状態）と行動aを利用して次状態を決める．
+        // 今回の環境では，指定された行動aによって次の状態が一意に決まるため．
         if(0 < action) {
             // first -> second への移動
             if(prevNumOfCarsInFirst < action) {
@@ -95,6 +118,7 @@ public class Normal {
             }
         }
 
+        // 引数として渡された次状態と，↑で算出した次状態が同じである場合，1を，違う場合はありえないので0を返す．
         if((expectedNumOfCarsInFirst == nextNumOfCarsInFirst) && (expectedNumOfCarsInSecond == nextNumOfCarsInSecond)) {
             // 期待される次状態と，渡された次状態が同じ場合
             return 1;
