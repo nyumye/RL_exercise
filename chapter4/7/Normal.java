@@ -2,8 +2,10 @@
 // -----  Policy Iteration -----
 // -----------------------------
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Normal {
 
@@ -27,6 +29,8 @@ public class Normal {
     int[][] policy = new int[maxNumOfCarsInFirstPlace][maxNumOfCarsInSecondPlace];
 
 
+    // 階乗計算結果を保存する
+    Map<Integer, Integer> factorialNum = new HashMap<>();
     // 
 
     boolean isPolicyStable;
@@ -84,7 +88,27 @@ public class Normal {
     // ある状態sにおいてある行動aを取った際に報酬rが得られる確率
     private double getRewardProb(int prevNumOfCarsInFirst, int prevNumOfCarsInSecond, int action, int reward) {
         double probability = 0.;
+
+        
+
         return probability;
+    }
+
+    // 階乗を計算する
+    private int calcFactorialNum(int n) {
+        // すでに計算済みだったらそれを返す．
+        if(factorialNum.containsKey(n)){
+            return factorialNum.get(n);
+        }
+
+        // まだ計算してなかったら
+        if(n > 0) {
+            int tempCalcResult = n * calcFactorialNum(n-1);
+            factorialNum.put(n, tempCalcResult);
+            return tempCalcResult;
+        } else {
+            return 1;
+        }
     }
 
     // 毎回計算しているね
