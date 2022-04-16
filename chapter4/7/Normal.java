@@ -17,11 +17,13 @@ public class Normal {
     // int[] numOfCars = {0,0};
 
     // ロケーションAに置かれる車の最大数と，ろけーしょんBにおけるそれ．
-    int maxNumOfCarsInFirstPlace = 10;
-    int maxNumOfCarsInSecondPlace = 10;
+    int maxNumOfCarsInFirstPlace = 20;
+    int maxNumOfCarsInSecondPlace = 20;
 
     // 報酬空間
-    int[] rewardSpace = {0,1};
+    // int[] rewardSpace = {0,1};
+    List<Integer> rewardSpace = new LinkedList<>();
+    
 
     // v(s) ある状態sにおける価値
     int[][] valueFunc = new int[maxNumOfCarsInFirstPlace][maxNumOfCarsInSecondPlace];
@@ -38,10 +40,17 @@ public class Normal {
     // policy evaluationに使うもの．
     double delta;
     double theta;
+    double gamma = 0.9;
+
 
 
     // initialization
     void init(){
+
+        // 報酬空間を整理．
+        for(int i = 0; i < (maxNumOfCarsInFirstPlace + maxNumOfCarsInSecondPlace); i++) {
+            rewardSpace.add(i * 10);
+        }
 
     }
 
@@ -75,9 +84,9 @@ public class Normal {
         // 状態空間をスイープする
         for (int i = 0; i < maxNumOfCarsInFirstPlace; i++) {
             for (int j = 0; j < maxNumOfCarsInSecondPlace; j++) {
-                // 状態空間もスイープする
-                for (int k = 0; k < rewardSpace.length; k++) {
-
+                // 報酬空間もスイープする
+                for (int reward : rewardSpace) {
+                    
                 }
             }
         }
@@ -89,9 +98,51 @@ public class Normal {
     private double getRewardProb(int prevNumOfCarsInFirst, int prevNumOfCarsInSecond, int action, int reward) {
         double probability = 0.;
 
+
+        // 次状態を得る
+        // 次状態において報酬rが取られる確率
         
 
         return probability;
+    }
+
+
+    // 指定状態から
+
+    // 指定状態sから行動aを取った際の次状態を返す．
+    private List<Integer> getNextState(List<Integer> prevState, int action) {
+        List<Integer> nextState = new LinkedList<>();
+        int expectedNumOfCarsInFirst = prevState.get(0);
+        int expectedNumOfCarsInSecond = prevState.get(1);
+        // prevState（前状態）と行動aを利用して次状態を決める．
+        // 今回の環境では，指定された行動aによって次の状態が一意に決まるため．
+        if(0 < action) {
+            // first -> second への移動
+            if(prevState.get(0) < action) {
+                // 移動させる量が現在所有している車の量よりも多かった場合．
+                expectedNumOfCarsInFirst = 0;
+                expectedNumOfCarsInSecond += prevState.get(0);
+            } else {
+                expectedNumOfCarsInFirst -= action;
+                expectedNumOfCarsInSecond += action;
+            }
+        } else {
+            // second -> first への移動
+            action = -action;
+            if(prevState.get(1) < action) {
+                // 移動させる量が現在所有している車の量よりも多かった場合．
+                expectedNumOfCarsInSecond = 0;
+                expectedNumOfCarsInFirst += prevState.get(1);
+            } else {
+                expectedNumOfCarsInSecond -= action;
+                expectedNumOfCarsInFirst += action;
+            }
+        }
+
+        nextState.add(expectedNumOfCarsInFirst);
+        nextState.add(expectedNumOfCarsInSecond);
+        return nextState;
+
     }
 
     // 階乗を計算する
@@ -115,32 +166,6 @@ public class Normal {
     // 遷移関数
     // 遷移関数を表す関数．ある状態sにおいて行動aを取った際にある状態s'に移る確率を返す．
     private double getTransitionProb(int prevNumOfCarsInFirst, int prevNumOfCarsInSecond, int nextNumOfCarsInFirst, int nextNumOfCarsInSecond, int action) {
-        int expectedNumOfCarsInFirst = prevNumOfCarsInFirst;
-        int expectedNumOfCarsInSecond = prevNumOfCarsInSecond;
-        // prevState（前状態）と行動aを利用して次状態を決める．
-        // 今回の環境では，指定された行動aによって次の状態が一意に決まるため．
-        if(0 < action) {
-            // first -> second への移動
-            if(prevNumOfCarsInFirst < action) {
-                // 移動させる量が現在所有している車の量よりも多かった場合．
-                expectedNumOfCarsInFirst = 0;
-                expectedNumOfCarsInSecond += prevNumOfCarsInFirst;
-            } else {
-                expectedNumOfCarsInFirst -= action;
-                expectedNumOfCarsInSecond += action;
-            }
-        } else {
-            // second -> first への移動
-            action = -action;
-            if(prevNumOfCarsInSecond < action) {
-                // 移動させる量が現在所有している車の量よりも多かった場合．
-                expectedNumOfCarsInSecond = 0;
-                expectedNumOfCarsInFirst += prevNumOfCarsInSecond;
-            } else {
-                expectedNumOfCarsInSecond -= action;
-                expectedNumOfCarsInFirst += action;
-            }
-        }
 
         // 引数として渡された次状態と，↑で算出した次状態が同じである場合，1を，違う場合はありえないので0を返す．
         if((expectedNumOfCarsInFirst == nextNumOfCarsInFirst) && (expectedNumOfCarsInSecond == nextNumOfCarsInSecond)) {
